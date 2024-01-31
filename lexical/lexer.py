@@ -26,6 +26,12 @@ def getKeywordToken(keyword, keyArray):
     if not is_keyword: token = 'identifier'
     return (token)
 
+# output file for <token, lexeme> pairs
+output_lexemes = open('files/lexemes.txt', 'w')
+
+# output file for errors
+output_errors = open('files/errors.txt', 'w')
+
 #* enter code file here!
 code_data = open('test cases/Test9.cp', 'r')
 # lexer = doubleBuffer(input_data)

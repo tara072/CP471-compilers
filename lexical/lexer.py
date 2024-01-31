@@ -26,12 +26,6 @@ def getKeywordToken(keyword, keyArray):
     if not is_keyword: token = 'identifier'
     return (token)
 
-# output file for <token, lexeme> pairs
-output_lexemes = open('files/lexemes.txt', 'w')
-
-# output file for errors
-output_errors = open('files/errors.txt', 'w')
-
 #* enter code file here!
 code_data = open('test cases/Test9.cp', 'r')
 # lexer = doubleBuffer(input_data)
@@ -61,13 +55,13 @@ while curr_point < len(atest):
     prev_state = curr_state
     curr_state = int(TRANS_TABLE[curr_state][c])
 
-    print('c: {} ({}) prev: {} current: {}, p_point: {}, c_point: {}'.format(c, chr(c), prev_state, curr_state, prev_point, curr_point))
+    # print('c: {} ({}) prev: {} current: {}, p_point: {}, c_point: {}'.format(c, chr(c), prev_state, curr_state, prev_point, curr_point))
     # error state
     if curr_state == -1:
-        print("error line {}: unrecognized character '{}'".format(line, test[curr_point]))
-        final_errors.append("error line {}: unrecognized character '{}'".format(line, test[curr_point]))
+        # print("error line {}: unrecognized character '{}'".format(line, test[curr_point]))
+        final_errors.append("error line {}: unrecognized character '{}'\n".format(line, test[curr_point]))
         curr_state = 0
-        print('change curr_state to 0')
+        # print('change curr_state to 0')
         curr_point += 1
         prev_point = curr_point
     # 0 state from 0 state (whitespace)
@@ -76,68 +70,68 @@ while curr_point < len(atest):
         curr_point += 1
     # <=, <>, >=
     elif curr_state == 2 or curr_state == 3 or curr_state == 7:
-        final_lexer.append('<comp, {}>'.format(test[prev_point:curr_point+1]))
+        final_lexer.append('<comp, {}>\n'.format(test[prev_point:curr_point+1]))
         curr_point += 1
         prev_point = curr_point
         curr_state = 0
     # <, >
     elif curr_state == 4 or curr_state == 8:
-        final_lexer.append('<comp, {}>'.format(test[prev_point:curr_point]))
+        final_lexer.append('<comp, {}>\n'.format(test[prev_point:curr_point]))
         prev_point = curr_point
         curr_state = 0
     # =
     elif curr_state == 5:
-        final_lexer.append('<operator, {}>'.format(test[curr_point]))
+        final_lexer.append('<operator, {}>\n'.format(test[curr_point]))
         curr_point += 1
         prev_point = curr_point
         curr_state = 0
     # identifier
     elif curr_state == 10:
-        final_lexer.append('<{}, {}>'.format(getKeywordToken(test[prev_point:curr_point], KEYWORDS), test[prev_point:curr_point]))
+        final_lexer.append('<{}, {}>\n'.format(getKeywordToken(test[prev_point:curr_point], KEYWORDS), test[prev_point:curr_point]))
         prev_point = curr_point
         curr_state = 0
     # double with E
     elif curr_state == 17:
-        final_lexer.append('<doubleE, {}>'.format(test[prev_point:curr_point]))
+        final_lexer.append('<doubleE, {}>\n'.format(test[prev_point:curr_point]))
         prev_point = curr_point
         curr_state = 0
     # int
     elif curr_state == 18:
-        final_lexer.append('<int, {}>'.format(test[prev_point:curr_point]))
+        final_lexer.append('<int, {}>\n'.format(test[prev_point:curr_point]))
         prev_point = curr_point
         curr_state = 0
     # double
     elif curr_state == 19:
-        final_lexer.append('<double, {}>'.format(test[prev_point:curr_point]))
+        final_lexer.append('<double, {}>\n'.format(test[prev_point:curr_point]))
         prev_point = curr_point
         curr_state = 0
     # deliminator
     elif curr_state == 20:
-        final_lexer.append('<delim, {}>'.format(test[curr_point]))
+        final_lexer.append('<delim, {}>\n'.format(test[curr_point]))
         curr_point += 1
         prev_point = curr_point
         curr_state = 0
     # +, -
     elif curr_state == 21:
-        final_lexer.append('<expr, {}>'.format(test[curr_point]))
+        final_lexer.append('<expr, {}>\n'.format(test[curr_point]))
         curr_point += 1
         prev_point = curr_point
         curr_state = 0
     # /, %, *
     elif curr_state == 22:
-        final_lexer.append('<term, {}>'.format(test[curr_point]))
+        final_lexer.append('<term, {}>\n'.format(test[curr_point]))
         curr_point += 1
         prev_point = curr_point
         curr_state = 0
     # panic state: double . not followed by integer
     elif curr_state == 23:
-        final_lexer.append('<double, {}>'.format(test[prev_point:curr_point-1]))
-        final_lexer.append('<delim, {}>'.format(test[curr_point-1]))
+        final_lexer.append('<double, {}>\n'.format(test[prev_point:curr_point-1]))
+        final_lexer.append('<delim, {}>\n'.format(test[curr_point-1]))
         prev_point = curr_point
         curr_state = 0
     # panic state: double E not followed by digit
     elif curr_state == 24:
-        final_lexer.append('<double, {}>'.format(test[prev_point:curr_point-1]))
+        final_lexer.append('<double, {}>\n'.format(test[prev_point:curr_point-1]))
         prev_point = curr_point - 1
         curr_state = 0
     # \n to track lines for errors
@@ -148,25 +142,35 @@ while curr_point < len(atest):
     # handle any unfinished lexemes at the end
     elif curr_point + 1 == len(atest):
         if curr_state == 9:
-            final_lexer.append('<{}, {}>'.format(getKeywordToken(test[prev_point:], KEYWORDS), test[prev_point:]))
+            final_lexer.append('<{}, {}>\n'.format(getKeywordToken(test[prev_point:], KEYWORDS), test[prev_point:]))
         elif curr_state == 11:
-            final_lexer.append('<int, {}>'.format(test[prev_point:]))
+            final_lexer.append('<int, {}>\n'.format(test[prev_point:]))
         elif curr_state == 13:
-            final_lexer.append('<double, {}>'.format(test[prev_point:]))
+            final_lexer.append('<double, {}>\n'.format(test[prev_point:]))
         elif curr_state == 14:
-            final_lexer.append('<doubleE, {}>'.format(test[prev_point:]))
+            final_lexer.append('<doubleE, {}>\n'.format(test[prev_point:]))
         elif curr_state == 16:
-            final_lexer.append('<doubleE, {}>'.format(test[prev_point:]))
+            final_lexer.append('<doubleE, {}>\n'.format(test[prev_point:]))
         curr_point += 1
     # else continue reading
     else:
         curr_point += 1
 
-# print <token, lexeme> pairs from array
-#TODO write to files to export pairs and errors
+# print <token, lexeme> pairs and error results
 print('='*10)
 for lex in final_lexer:
-    print(lex)
+    print(lex.strip())
 print('='*10)
 for error in final_errors:
-    print(error)
+    print(error.strip())
+
+# write results to respective output files
+# output file for <token, lexeme> pairs
+output_lexemes = open('files/lexemes.txt', 'w')
+output_lexemes.writelines(final_lexer)
+output_lexemes.close()
+
+# output file for errors
+output_errors = open('files/errors.txt', 'w')
+output_errors.writelines(final_errors)
+output_errors.close()

@@ -266,13 +266,15 @@ def readBuffer(buffer):
             curr_state = 0
         # determine if lexeme continues in next buffer
         elif curr_point + 1 == len(buffer):
-            if not (int(TRANS_TABLE[curr_state][buffer[curr_point] + 1]) == 0):
-                contBuff = True
-                cont_point = prev_point
-            else: 
-                contBuff = False
-                cont_point = 0
-
+            if contBuff:
+                final_errors.append("error line {}: value exceeds character limit\n".format(line))
+            else:
+                if not (int(TRANS_TABLE[curr_state][buffer[curr_point] + 1]) == 0):
+                    contBuff = True
+                    cont_point = prev_point
+                else: 
+                    contBuff = False
+                    cont_point = 0
             curr_point += 1
         # else continue reading
         else:

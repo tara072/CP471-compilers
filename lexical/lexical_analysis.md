@@ -1,6 +1,11 @@
 # Lexical Analysis
 *Documentation for the lexical analysis section of my project*
 
+### How to Run
+1. Enter the name of the file with code to read on line 13 of `lexer.py`
+2. Run `lexer.py`
+3. Optional: adjust the `BUFFER_SIZE` constant to change the buffer size
+
 ### Transition Table
 My transition table is in `files/transition_table.txt`. It consists of 128 columns for each ascii character and 25 rows for each state I have. Out of the 25 states, 14 of them are accept states and 2 are panic states. 
 

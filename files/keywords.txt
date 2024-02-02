@@ -1,0 +1,7 @@
+fdec: def, fed 
+type: int, double
+statement: if, fi, then, else, while, do, od, print, return
+bexpr: or
+bterm: and
+bfactor: not
+assignment: assign

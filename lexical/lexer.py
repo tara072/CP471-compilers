@@ -8,6 +8,8 @@ TRANS_TABLE = read_transition_table()
 final_lexer = []
 # array to store errors
 final_errors = []
+# array for parser lexeme token pairs
+final_array_lexer = []
 
 #* enter code file here!
 code_data = open('test cases/Test9.cp', 'r')
@@ -31,7 +33,11 @@ cont_point = 0 # point where the continued string starts in the last buffer
 # buffer size
 BUFFER_SIZE = 2048
 
-# checking if identifier string is a keyword or not
+'''
+#* checking if identifier string is a keyword or not
+params: keyword = identifier string, keyArray = array of keywords
+return: token = keyword or "identifier" (string)
+'''
 def getKeywordToken(keyword, keyArray): 
     is_keyword = False
     token = ''
@@ -47,6 +53,11 @@ def getKeywordToken(keyword, keyArray):
     if not is_keyword: token = 'identifier'
     return (token)
 
+'''
+#* fill buffer with characters
+params: code = the code file (open file)
+return: filled buffer (array)
+'''
 def fillBuffer(code):
     data = code.read(BUFFER_SIZE)
     if not data:
@@ -56,7 +67,13 @@ def fillBuffer(code):
         test = ''.join(chr(c) for c in buffer)
         return buffer
 
-# loop to read code in buffer
+'''
+#* loop to read the code characters in the buffer
+adds the resulting token, lexeme pairs to the final_lexer array and final_array_lexer
+adds errors to final_errors array
+params: buffer = the buffer to read from (array)
+return: -
+'''
 def readBuffer(buffer):
     # state tracking
     global curr_state, prev_state
@@ -97,10 +114,12 @@ def readBuffer(buffer):
                     fullLex = buffA[cont_point:] + buffB[:curr_point]
                     
                 final_lexer.append('<comp, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['comp', chr(fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<comp, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point+1])))
+                final_array_lexer.append(['comp', chr(buffer[prev_point:curr_point+1])])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0
@@ -113,15 +132,18 @@ def readBuffer(buffer):
                     fullLex = buffA[cont_point:] + buffB[:curr_point]
                     
                 final_lexer.append('<comp, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['comp', chr(fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<comp, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point])))
+                final_array_lexer.append(['comp', ''.join(chr(c) for c in buffer[prev_point:curr_point])])
             prev_point = curr_point
             curr_state = 0
         # =
         elif curr_state == 5:
             final_lexer.append('<operator, {}>\n'.format(''.join(chr(buffer[curr_point]))))
+            final_array_lexer.append(['operator', chr(buffer[curr_point])])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0
@@ -137,6 +159,10 @@ def readBuffer(buffer):
                     getKeywordToken(''.join(chr(c) for c in fullLex), KEYWORDS),
                     ''.join(chr(c) for c in fullLex)
                 ))
+                final_array_lexer.append([
+                    getKeywordToken(''.join(chr(c) for c in fullLex), KEYWORDS),
+                    chr(fullLex)
+                ])
                 contBuff = False
                 cont_point = 0
             else:
@@ -144,6 +170,10 @@ def readBuffer(buffer):
                     getKeywordToken(''.join(chr(c) for c in buffer[prev_point:curr_point]), KEYWORDS),
                     ''.join(chr(c) for c in buffer[prev_point:curr_point])
                 ))
+                final_array_lexer.append([
+                    getKeywordToken(''.join(chr(c) for c in buffer[prev_point:curr_point]), KEYWORDS),
+                    ''.join(chr(c) for c in buffer[prev_point:curr_point])
+                ])
             prev_point = curr_point
             curr_state = 0
         # double with E
@@ -155,10 +185,12 @@ def readBuffer(buffer):
                     fullLex = buffA[cont_point:] + buffB[:curr_point]
                     
                 final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point])))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffer[prev_point:curr_point])])
             prev_point = curr_point
             curr_state = 0
         # int
@@ -170,10 +202,12 @@ def readBuffer(buffer):
                     fullLex = buffA[cont_point:] + buffB[:curr_point]
                     
                 final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point])))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in buffer[prev_point:curr_point])])
             prev_point = curr_point
             curr_state = 0
         # double
@@ -185,27 +219,32 @@ def readBuffer(buffer):
                     fullLex = buffA[cont_point:] + buffB[:curr_point]
                     
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point])))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in buffer[prev_point:curr_point])])
             prev_point = curr_point
             curr_state = 0
         # deliminator
         elif curr_state == 20:
             final_lexer.append('<delim, {}>\n'.format(''.join(chr(buffer[curr_point]))))
+            final_array_lexer.append(['delim', ''.join(chr(buffer[curr_point]))])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0
         # +, -
         elif curr_state == 21:
             final_lexer.append('<expr, {}>\n'.format(''.join(chr(buffer[curr_point]))))
+            final_array_lexer.append(['expr', chr(buffer[curr_point])])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0
         # /, %, *
         elif curr_state == 22:
             final_lexer.append('<term, {}>\n'.format(''.join(chr(buffer[curr_point]))))
+            final_array_lexer.append(['term', ''.join(chr(buffer[curr_point]))])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0
@@ -228,12 +267,16 @@ def readBuffer(buffer):
                         delimLex = buffB[curr_point-1]
                     
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in doubleLex)))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in doubleLex)])
                 final_lexer.append('<delim, {}>\n'.format(''.join(chr(delimLex))))
+                final_array_lexer.append(['delim', ''.join(chr(delimLex))])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point-1])))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in buffer[prev_point:curr_point-1])])
                 final_lexer.append('<delim, {}>\n'.format(''.join(chr(buffer[curr_point-1]))))
+                final_array_lexer.append(['delim', ''.join(chr(buffer[curr_point-1]))])
             prev_point = curr_point
             curr_state = 0
         # panic state: double E not followed by digit
@@ -251,10 +294,12 @@ def readBuffer(buffer):
                         fullLex = buffA[cont_point:] + buffB[:curr_point-1]
                     
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in fullLex)))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in fullLex)])
                 contBuff = False
                 cont_point = 0
             else:
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point-1])))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in buffer[prev_point:curr_point-1])])
             prev_point = curr_point - 1
             curr_point -= 1
             curr_state = 0
@@ -280,57 +325,95 @@ def readBuffer(buffer):
         else:
             curr_point += 1
 
-buffA = fillBuffer(code_data)
-while not buffA == -1 and not buffB == -1:
-    if currBuff == 0:
-        readBuffer(buffA)
-        currBuff = 1
-        buffB = fillBuffer(code_data)
-    else: 
-        readBuffer(buffB)
-        currBuff = 0
-        buffA = fillBuffer(code_data)
+'''
+#* run the lexer
+writes final errors and token-lexeme pairs into respective txt files
+params: -
+return: final_array_lexer = array of token-lexeme array pairs for parser
+'''
+def runLexer():
+    global buffA, buffB, currBuff
+    buffA = fillBuffer(code_data)
+    while not buffA == -1 and not buffB == -1:
+        if currBuff == 0:
+            readBuffer(buffA)
+            currBuff = 1
+            buffB = fillBuffer(code_data)
+        else: 
+            readBuffer(buffB)
+            currBuff = 0
+            buffA = fillBuffer(code_data)
 
-# handle any unfinished lexemes at the end
-if contBuff:
-    if currBuff == 1:
-        if curr_state == 9:
-            final_lexer.append('<{}, {}>\n'.format(getKeywordToken(''.join(chr(c) for c in buffA[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffA[cont_point:])))
-        elif curr_state == 11:
-            final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
-        elif curr_state == 13:
-            final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
-        elif curr_state == 14:
-            final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
-        elif curr_state == 16:
-            final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
-    else:
-        if curr_state == 9:
-            final_lexer.append('<{}, {}>\n'.format(getKeywordToken(''.join(chr(c) for c in buffB[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffB[cont_point:])))
-        elif curr_state == 11:
-            final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
-        elif curr_state == 13:
-            final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
-        elif curr_state == 14:
-            final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
-        elif curr_state == 16:
-            final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
+    # handle any unfinished lexemes at the end
+    if contBuff:
+        if currBuff == 1:
+            if curr_state == 9:
+                final_lexer.append('<{}, {}>\n'.format(getKeywordToken(''.join(chr(c) for c in buffA[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffA[cont_point:])))
+                final_array_lexer.append([getKeywordToken(''.join(chr(c) for c in buffA[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffA[cont_point:])])
+            elif curr_state == 11:
+                final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in buffA[cont_point:])])
+            elif curr_state == 13:
+                final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in buffA[cont_point:])])
+            elif curr_state == 14:
+                final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffA[cont_point:])])
+            elif curr_state == 16:
+                final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffA[cont_point:])])
+        else:
+            if curr_state == 9:
+                final_lexer.append('<{}, {}>\n'.format(getKeywordToken(''.join(chr(c) for c in buffB[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffB[cont_point:])))
+                final_array_lexer.append([getKeywordToken(''.join(chr(c) for c in buffB[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffB[cont_point:])])
+            elif curr_state == 11:
+                final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in buffB[cont_point:])])
+            elif curr_state == 13:
+                final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
+                final_array_lexer.append(['double', ''.join(chr(c) for c in buffB[cont_point:])])
+            elif curr_state == 14:
+                final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffB[cont_point:])])
+            elif curr_state == 16:
+                final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
+                final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffB[cont_point:])])
 
-# print <token, lexeme> pairs and error results
-print('='*10)
-for lex in final_lexer:
-    print(lex.strip())
-print('='*10)
-for error in final_errors:
-    print(error.strip())
+    printFinals(final_lexer, final_errors, final_array_lexer)
 
-# write results to respective output files
-# output file for <token, lexeme> pairs
-output_lexemes = open('files/lexemes.txt', 'w')
-output_lexemes.writelines(final_lexer)
-output_lexemes.close()
+    # write results to respective output files
+    # output file for <token, lexeme> pairs
+    output_lexemes = open('files/lexemes.txt', 'w')
+    output_lexemes.writelines(final_lexer)
+    output_lexemes.close()
 
-# output file for errors
-output_errors = open('files/errors.txt', 'w')
-output_errors.writelines(final_errors)
-output_errors.close()
+    # output file for errors
+    output_errors = open('files/errors.txt', 'w')
+    output_errors.writelines(final_errors)
+    output_errors.close()
+    
+    return final_array_lexer
+
+'''
+#* print <token, lexeme> pairs and error results from all 3 result arrays
+params: 
+- final_lexer = array of token-lexeme strings
+- final_errors = array of errors
+- final_array_lexer = array of token-lexeme arrays
+return: -
+'''
+def printFinals(final_lexer, final_errors, final_array_lexer):
+    print('='*10)
+    print('Final Lexer')
+    for lex in final_lexer:
+        print(lex.strip())
+    print('='*10)
+    print('Final Errors')
+    for error in final_errors:
+        print(error.strip())
+    print('='*10)
+    print('Final Array Lexer')
+    for lex in final_array_lexer:
+        print(lex)
+
+runLexer()

@@ -1,3 +1,5 @@
+from lexer import runLexer
+
 FIRSTSET = {
     "program": ["def", "int", "double", "if", "while", "print", "return", "identifier"] ,
     "fdecls": ["def", "EPSILON"] ,
@@ -35,3 +37,52 @@ FIRSTSET = {
     "var": ["identifier"],
     "varEnd": ["[", "EPSILON"],
 }
+
+# getting array of lexemes from lexer
+# lexemes = runLexer()
+lexemes = [
+    "<statement, print>",
+    "<int, 21>",
+    "<identifier, gcd>",
+    "<delim, (>",
+    "<int, 21>",
+    "<delim, ,>",
+    "<int, 15>",
+    "<delim, )>",
+    "<delim, .>"
+    ]
+
+# index of current token
+current = 0 
+# current token [token, lexeme]
+curr_token = lexemes[current][1:-1].split(',')
+# lookahead token
+lookahead = lexemes[current+1][1:-1].split(',')
+
+'''
+#* get the next token(s)
+- update the current index, current token and lookahead token
+params: -
+return: -
+'''
+def nextToken():
+    global curr_token, current, lookahead
+    current += 1
+    curr_token = lookahead
+    lookahead = lexemes[current+1][1:-1].split(',')
+
+# print(curr_token)
+# print(lookahead)
+# nextToken()
+# print(curr_token)
+# print(lookahead)
+
+'''
+#* check the FIRSTSET for grammar operations
+params: lex = non-terminal lexeme to check (string)
+return: first = type of lexeme (string)
+'''
+def checkFIRST(lex):
+    print(FIRSTSET[lex])
+
+checkFIRST('program')

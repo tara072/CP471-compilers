@@ -119,7 +119,7 @@ def readBuffer(buffer):
                 cont_point = 0
             else:
                 final_lexer.append('<comp, {}>\n'.format(''.join(chr(c) for c in buffer[prev_point:curr_point+1])))
-                final_array_lexer.append(['comp', chr(buffer[prev_point:curr_point+1]), line])
+                final_array_lexer.append(['comp', ''.join(chr(c) for c in buffer[prev_point:curr_point+1]), line])
             curr_point += 1
             prev_point = curr_point
             curr_state = 0

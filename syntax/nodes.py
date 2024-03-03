@@ -7,27 +7,27 @@ class Program:
         self.stmtSeq = []
 
     def __str__(self):
-#         return('''======
-# program: 
-# fdecls: {}
-# decls: {}
-# stmtSeq: {}
-# '''.format(self.fdecls, self.decls[0], self.stmtSeq))
-        final = '''======
-program:'''
-        final += '\nfdecls: '
+        fdeclsStr = ""
         for node in self.fdecls:
-            final += '   {} '.format(node)
-        final += '\n---------------'
-        final += '\ndecls: '
+            fdeclsStr += '{} '.format(node)
+
+        declsStr = ""
         for node in self.decls:
-            final += '   {} '.format(node)
-        final += '\n---------------'
-        final += '\nstmtSeq: '
+            declsStr += '\n{}'.format(node)
+
+        stmtStr = ""
         for node in self.stmtSeq:
-            final += '   {} '.format(node)
-        final += '\n---------------'
-        return final
+            stmtStr += '\n{}'.format(node)
+
+        return('''******
+PROGRAM:
+======
+FDECLS: {}
+======
+DECLS: {}
+======
+STMTSEQ: {}
+******'''.format(fdeclsStr, declsStr, stmtStr))
 
 # NODES
 '''
@@ -55,16 +55,18 @@ class fdefNode:
             declsStr += '{}'.format(node)
         stmtStr = ''
         for node in self.stmtSeq:
-            final += '{}'.format(node)
+            stmtStr += '{}'.format(node)
         return('''fdefNode:
     fdefNode/type:
     --> type/{}
+    fdefNode/fname:
+    --> fname/{}
     fdefNode/params:
     --> params/{}
     fdefNode/decls:
     --> decls/{}
     fdefNode/stmtSeq:
-    --> stmtSeq/{}'''.format(self.type, paramsStr, declsStr, stmtStr))
+    --> stmtSeq/{}'''.format(self.type, self.fname, paramsStr, declsStr, stmtStr))
 
 '''
 #* param node
@@ -90,8 +92,8 @@ class paramNode:
     - varlist (list of var nodes)
 '''
 class declNode:
-    def __init__(self, token):
-        self.type = token
+    def __init__(self):
+        self.type = []
         self.varlist = []
     
     def __str__(self):

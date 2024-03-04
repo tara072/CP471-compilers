@@ -7,7 +7,7 @@
 3. The program will run and print out updates as a log of it's current run
 4. At the end, it will print the AST of the results and the errors
 
-### First and Follow Table
+### First and Follow Sets
 The First values are also in the code in `parser.py`
 | non-terminal | FIRST | FOLLOW |
 |---|---|---|
@@ -50,4 +50,4 @@ The First values are also in the code in `parser.py`
 | fname | {any letter} | (, [, ., ), ,, *, /, %, +,<br>-, ], ;, <, >, =, ==,<br><=, >=, <>, fi, else,<br>od, fed |
 
 ### Errors
- There is one output file: `errors.txt` to store any syntax errors that occur within the project.
+ There is one output file: `syntax_errors.txt` to store any syntax errors that occur within the project.

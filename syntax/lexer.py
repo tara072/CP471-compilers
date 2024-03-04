@@ -12,7 +12,7 @@ final_errors = []
 final_array_lexer = []
 
 #* enter code file here!
-code_data = open('test cases/Test9.cp', 'r')
+code_data = open('test cases/TestParser.cp', 'r')
 
 # # state tracking
 curr_state = 0
@@ -390,7 +390,7 @@ def runLexer():
     output_lexemes.close()
 
     # output file for errors
-    output_errors = open('files/errors.txt', 'w')
+    output_errors = open('files/lex_errors.txt', 'w')
     output_errors.writelines(final_errors)
     output_errors.close()
     

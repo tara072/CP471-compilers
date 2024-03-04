@@ -390,7 +390,7 @@ def runLexer():
     output_lexemes.close()
 
     # output file for errors
-    output_errors = open('files/errors.txt', 'w')
+    output_errors = open('files/lex_errors.txt', 'w')
     output_errors.writelines(final_errors)
     output_errors.close()
     

@@ -12,7 +12,7 @@ final_errors = []
 final_array_lexer = []
 
 #* enter code file here!
-code_data = open('test cases/Test9.cp', 'r')
+code_data = open('test cases/TestParser.cp', 'r')
 
 # # state tracking
 curr_state = 0
@@ -381,7 +381,7 @@ def runLexer():
                 final_lexer.append('<doubleE, {}>\n'.format(''.join(chr(c) for c in buffB[cont_point:])))
                 final_array_lexer.append(['doubleE', ''.join(chr(c) for c in buffB[cont_point:]), line])
 
-    printFinals(final_lexer, final_errors, final_array_lexer)
+    # printFinals(final_lexer, final_errors, final_array_lexer)
 
     # write results to respective output files
     # output file for <token, lexeme> pairs

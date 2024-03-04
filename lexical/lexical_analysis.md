@@ -20,7 +20,7 @@ I have 3 input files in my project and 2 output files. All of these files are st
 code_data = open('test cases/Test9.cp', 'r')
  ```
 
- The 2 output files are `lexemes.txt` to store my <token, lexeme> pairs and `errors.txt` to store any lexical errors that occur within the project. The lexical errors in my project are characters which are not included in the grammar of the language (for example: ~). 
+ The 2 output files are `lexemes.txt` to store my <token, lexeme> pairs and `lex_errors.txt` to store any lexical errors that occur within the project. The lexical errors in my project are characters which are not included in the grammar of the language (for example: ~). 
 
  ### Double Buffers
  A double buffer has been implemented in this lexical analyzer, the two buffers are labeled `buffA` and `buffB`. They are arrays that store up to 2048 characters read from the code. There is also `currBuff`, to track which buffer is currently being used, and `BUFFER_SIZE` to save the length of the buffer as a constant.

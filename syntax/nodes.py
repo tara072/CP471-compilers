@@ -74,8 +74,8 @@ class fdefNode:
     - var (var node)
 '''
 class paramNode:
-    def __init__(self, type):
-        self.type = type
+    def __init__(self):
+        self.type = None
         self.var = None
 
     def __str__(self):

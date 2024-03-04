@@ -68,16 +68,13 @@ def nextToken():
     global current, curr_index, lookahead
     curr_index += 1
     current = lookahead
-    try:
-        if curr_index + 1 < len(lexemes):
-            lookahead = lexemes[curr_index+1]
-        else: 
-            # return "EOF" when current token is final 
-            lookahead = "EOF"
-        print("nextToken new current: {}".format(current))
-        print("nextToken new lookahead: {}".format(lookahead))
-    except:
-        final_errors.append('error parsing at line {}'.format(lexemes[curr_index+1][2]))
+    if curr_index + 1 < len(lexemes):
+        lookahead = lexemes[curr_index+1]
+    else: 
+        # return "EOF" when current token is final 
+        lookahead = "EOF"
+    print("nextToken new current: {}".format(current))
+    print("nextToken new lookahead: {}".format(lookahead))
 
 '''
 #* check the FIRSTSET for grammar operations
@@ -101,9 +98,7 @@ def checkFIRST(nonTerm):
         else:
             print("FIRST: null")
             return ""
-    #TODO: add error handling!!
     except KeyError:
-        # "program" is not in the dict
         print("KeyError")
         return ""
     except Exception as e:
@@ -115,18 +110,19 @@ def checkFIRSTCustom(nonTerm, customValue):
         firsts = FIRSTSET[nonTerm]
 
         if firsts:
-            if (customValue in firsts):
-                print("FIRST: {}".format(customValue))
-                return customValue
+            if ((customValue[0] == ID or customValue[0] == INT or customValue[0] == DOUBLE or customValue[0] == DOUBLEE) and customValue[0] in firsts):
+                print("FIRST: {}".format(customValue[0]))
+                return customValue[0]
+            elif (customValue[1] in firsts):
+                print("FIRST: {}".format(customValue[1]))
+                return customValue[1]
             else:
                 print("FIRST: null")
                 return ""
         else:
             print("FIRST: null")
             return ""
-    #TODO: add error handling!!
     except KeyError:
-        # "program" is not in the dict
         print("KeyError")
         return ""
     except Exception as e:
@@ -172,20 +168,21 @@ def parse():
             program.fdecls = checkFDecls()
             program.decls = checkDeclarations()
             program.stmtSeq = checkStmtSeq()
-            match(['delim', '.'])
-            print(program)
+            if not match(['delim', '.']):
+                final_errors.append('syntax error: expecting "." at the end of the program\n')
+            printFinals(program, final_errors)
+            # write results to error output file
+            output_errors = open('files/syntax_errors.txt', 'w')
+            output_errors.writelines(final_errors)
+            output_errors.close()
             return program
         else:
-            #TODO: log error
-            print("empty tokenType == error")
-    #TODO: add error handling
-    except KeyError:
-        # "program" is not in the dict
-        print("KeyError")
+            final_errors.append('syntax error (line {}): illegal lexeme ({}) for program\n'.format(current[2], current[1]))
+            printFinals(program, final_errors)
     except Exception as e:
         print(e)
+        final_errors.append('error: {}\n'.format(e))
 
-#! TODO: fdecl nodes and parser functions!
 '''
 #* check function declarations
 <fdecls> ::= <fdec>; | <fdecls> <fdec>; | e
@@ -200,11 +197,9 @@ def checkFDecls():
         node = checkFDef()
         nodes.append(node)
         if not match(['delim', ';']):
-            # TODO: log error
-            print("error line 204")
+            final_errors.append('syntax error (line {}): expected ";" after function definition, recieved "{}"\n'.format(current[2], current[1]))
     return nodes
 
-#! add in errors (wherever match functions are??) see printing errors too!!
 '''
 #* get function declaration
 params: -
@@ -212,20 +207,19 @@ return: fdef (fdefNode)
 '''
 def checkFDef():
     fdef = nodes.fdefNode()
-    #TODO add errors here
     if match(['fdec', 'def']):
         if checkFIRST("type") == "":
-            print("error fdef type line 217")
+            final_errors.append('syntax error (line {}): expected function return type after def, recieved "{}"\n'.format(current[2], current[1]))
         # match function return type
         fdef.type = current[:2]
         matchType("type")
         if current[0] != ID:
-            print("error fdef id")
+            final_errors.append('syntax error (line {}): expected function name after return, recieved "{}"\n'.format(current[2], current[1]))
         # match fname
         fdef.fname = current[:2]
         matchType(ID)
         if match(['delim', '(']) == "":
-            print("error fdef (")
+            final_errors.append('syntax error (line {}): expected "(" after function name, recieved "{}"\n'.format(current[2], current[1]))
         # get params
         fdef.params = []
         while current[1] != "EOF" and checkFIRST("params") != "":
@@ -234,23 +228,23 @@ def checkFDef():
             matchedComma = match(['delim', ','])
             if not matchedComma and checkFIRSTCustom("params", lookahead[1]) != "":
             # no comma, but another param
-                print("error line 397")
+                final_errors.append('syntax error (line {}): expected comma when multiple parameters, recieved "{}"\n'.format(current[2], current[1]))
                 nextToken()
             elif matchedComma and checkFIRSTCustom("params", current[1]) == "":
                 # comma, but no more params
-                print("error line 399")
+                final_errors.append('syntax error (line {}): expected another parameter after comma, recieved "{}"\n'.format(current[2], current[1]))
         
         if not match(['delim', ')']):
-            print("error fdef )")
+            final_errors.append('syntax error (line {}): expected "(" after function parameters, recieved "{}"\n'.format(current[2], current[1]))
         
         fdef.decls = checkDeclarations()
         fdef.stmtSeq = checkStmtSeq()
 
         if not match(['fdec', 'fed']):
-            print("error fdef fed")
+            final_errors.append('syntax error (line {}): expected fed at the end of the function definition, recieved "{}"\n'.format(current[2], current[1]))
     
     else:
-        print("error fdec def")
+        final_errors.append('syntax error (line {}): expected "def" for function definition, recieved "{}"\n'.format(current[2], current[1]))
 
     return fdef
 
@@ -261,9 +255,12 @@ params: -
 return: param (paramNode)
 '''
 def checkParam():
-    param = nodes.paramNode(current[:2])
-    matchType('type')
-    param.var = checkVar()
+    param = nodes.paramNode()
+    if match(['type', 'int']) or match([['type', 'double']]):
+        param.type = current
+        param.var = checkVar()
+    else:
+        final_errors.append('syntax error (line {}): expected a type for param, recieved "{}"\n'.format(current[2], current[1]))
     return param
 
 '''
@@ -281,12 +278,12 @@ def checkDeclarations():
     while current[1] != "EOF" and checkFIRST("declarations") != "":
         node = checkDecl()
         nodes.append(node)
-        #TODO: handle if match returns false
         if (not match(["delim", ";"])):
-            print("error line 260")
+            final_errors.append('syntax error (line {}): expected ";" after declaration, recieved "{}"\n'.format(current[2], current[1]))
         nodesEnd = checkDeclarationsEnd()
         nodes.extend(nodesEnd)
-    #TODO: handle errors? (and do so for the rest?)
+    if checkFIRST("fdecls"):
+        final_errors.append('syntax error (line {}): function declarations should be before declarations, recieved "{}"\n'.format(current[2], current[1]))
     return nodes
 
 '''
@@ -301,11 +298,14 @@ def checkDecl():
     node = nodes.declNode()
 
     if tokenType != "":
-        node.declNode = current[:2]
+        node.type = current[:2]
         match(current[:2])
-        #TODO double check this is actually a valid thing to do
+        if not checkFIRST("varlist"):
+            final_errors.append('syntax error (line {}): expected variable name after declaration, recieved "{}"\n'.format(current[2], current[1]))
         node.varlist = checkVarlist()
         return node
+    else:
+        final_errors.append('syntax error (line {}): expected type for declaration, recieved "{}"\n'.format(current[2], current[1]))
     return None
 
 '''
@@ -324,8 +324,8 @@ def checkDeclarationsEnd():
     if tokenType != "":
         node = checkDecl()
         nodes.append(node)
-        #TODO: handle if match returns false
-        match(["delim", ";"])
+        if not match(["delim", ";"]):
+            final_errors.append('syntax error (line {}): expected ";" after declaration, recieved "{}"\n'.format(current[2], current[1]))
         nodesEnd = checkDeclarationsEnd()
         nodes.extend(nodesEnd)
     return nodes
@@ -366,6 +366,8 @@ def checkVar():
         var = nodes.varNode(current)
         matchType(ID)
         var.varEnd = checkVarEnd()
+    else:
+        final_errors.append('syntax error (line {}): expected identifier for var, recieved "{}"\n'.format(current[2], current[1]))
     return var
 
 '''
@@ -378,7 +380,12 @@ return: -
 '''
 def checkVarEnd():
     print("checkVarEnd: {}".format(current))
-    #TODO: double check
+    tokenType = checkFIRST("varEnd")
+    if tokenType != "":
+        match(['delim', '['])
+        expr = checkExpr()
+        if not match(['delim', ']']):
+            final_errors.append('syntax error (line {}): expected "]" after expression, recieved "{}"\n'.format(current[2], current[1]))
     return None
 
 '''
@@ -412,16 +419,21 @@ def checkStmtSeq():
         statement = checkStatement()
         if statement is not None:
             statements.append(statement)
-        # otherStatements = checkStmtSeqEnd()
-        # statements.extend(otherStatements)
         matchedSemi = match(['delim', ';'])
-        if not matchedSemi and checkFIRSTCustom("statementSeq", lookahead[1]) != "":
+        statementFollowings = ['fi', 'else', 'od']
+        if not matchedSemi and current[1] not in statementFollowings and checkFIRSTCustom("statementSeq", lookahead) != "":
             # no semicolon, but another statement
-            print("error line 397")
+            final_errors.append('syntax error (line {}): expected ";" between statements, recieved "{}"\n'.format(current[2], current[1]))
             nextToken()
-        elif matchedSemi and checkFIRSTCustom("statementSeq", current[1]) == "":
+        elif matchedSemi and checkFIRST("statementSeq") == "":
             # semicolon, but no more statements
-            print("error line 399")
+            final_errors.append('syntax error (line {}): expected no ";" after statement, recieved "{}"\n'.format(current[2], current[1]))
+    
+    if checkFIRST("fdecls"):
+        final_errors.append('syntax error (line {}): function declarations should be before declarations and statements, recieved "{}"\n'.format(current[2], current[1]))
+    elif checkFIRST("declarations"):
+        final_errors.append('syntax error (line {}): declarations should be before statements, recieved "{}"\n'.format(current[2], current[1]))
+
     return statements
 
 '''
@@ -435,8 +447,7 @@ def checkStmtSeqEnd():
     statements = []
 
     if tokenType != "":
-        if not match(['delim', ';']):
-            print("error line 409")
+        match(['delim', ';'])
         statement = checkStatement()
         if statement is not None:
             statements.append(statement)
@@ -450,7 +461,6 @@ def checkStmtSeqEnd():
     - assignment, if, while, builtin (build)
     params: -
     return: statement node
-    #TODO: try logging errors into array here?? like in lexer?
 '''
 def checkStatement():
     print("Statement: {}".format(current))
@@ -461,33 +471,39 @@ def checkStatement():
         if lookahead[1] == "=":
             varNode = checkVar()
             match(['operator', '='])
+            if checkFIRST("expr") == "":
+                final_errors.append('syntax error (line {}): expected expression after "=", recieved "{}"\n'.format(current[2], current[1]))
             exprNode = checkExpr()
             stmt = nodes.assignStmtNode(varNode, exprNode)
         else:
-            print("error checkStatement line 469")
-            #TODO: log error
+            final_errors.append('syntax error (line {}): expected "=" after variable, recieved "{}"\n'.format(current[2], current[1]))
+            nextToken()
     # if statement
     # <stmt> := if <bexpr> then <statement_seq> fi | 
     #       if <bexpr> then <statement_seq> else <statement_seq> fi
     elif tokenType == "if":
         match(['statement', 'if'])
         bexprNode = checkBexpr()
-        match(['statement', 'then'])
+        if not match(['statement', 'then']):
+            final_errors.append('syntax error (line {}): expected "then" after if expression, recieved "{}"\n'.format(current[2], current[1]))
         stmtSeqNode = checkStmtSeq()
         if match(['statement', 'else']):
             elseStmtSeqs = checkStmtSeq()
         else:
             elseStmtSeqs = []
-        match(['statement', 'fi'])
+        if not match(['statement', 'fi']):
+            final_errors.append('syntax error (line {}): expected "fi" at end of the if statement, recieved "{}"\n'.format(current[2], current[1]))
         stmt = nodes.ifStmtNode(bexprNode, stmtSeqNode, elseStmtSeqs)
     
     # while statement while <bexpr> do <statement_seq> od
     elif tokenType == "while":
         match(['statement', 'while'])
         bexprNode = checkBexpr()
-        match(['statement', 'do'])
+        if not match(['statement', 'do']):
+            final_errors.append('syntax error (line {}): expected "do" after while expression, recieved "{}"\n'.format(current[2], current[1]))
         stmtSeqNode = checkStmtSeq()
-        match(['statement', 'od'])
+        if not match(['statement', 'od']):
+            final_errors.append('syntax error (line {}): expected "od" at the end of the while statement, recieved "{}"\n'.format(current[2], current[1]))
         stmt = nodes.whileStmtNode(bexprNode, stmtSeqNode)
     
     # built in statement print <expr> 
@@ -503,6 +519,9 @@ def checkStatement():
         match(['statement', 'return'])
         expr = checkExpr()
         stmt = nodes.builtStmt(tt, expr)
+
+    else:
+        final_errors.append('syntax error (line {}): invalid start of statement, recieved "{}"\n'.format(current[2], current[1]))
 
     return stmt
 
@@ -534,7 +553,8 @@ def checkExprSeqEnd():
     nodes = []
 
     if tokenType != "":
-        match(['delim', ','])
+        if match(['delim', ',']) and not checkFIRST("exprSeqEnd"):
+            final_errors.append('syntax error (line {}): invalid follow after comma in expression sequence, recieved "{}"\n'.format(current[2], current[1]))
         exprs = checkExprSeq()
         nodes.extend(exprs)
     return nodes
@@ -597,7 +617,8 @@ def checkBexprEnd():
     tokenType = checkFIRST("bexprEnd")
     if tokenType != "":
         bexprEnd = nodes.bexprEndNode()
-        match(['bexpr', 'or'])
+        if not match(['bexpr', 'or']):
+            final_errors.append('syntax error (line {}): expected "or", recieved "{}"\n'.format(current[2], current[1]))
         bexprEnd.bterm = checkBterm()
         bexprEnd.bexprEnd = checkBexprEnd()
         return bexprEnd
@@ -630,7 +651,8 @@ def checkBtermEnd():
 
     if tokenType != "":
         btermEnd = nodes.btermEndNode()
-        match(['bterm', 'and'])
+        if not match(['bterm', 'and']):
+            final_errors.append('syntax error (line {}): expected "and", recieved "{}"\n'.format(current[2], current[1]))
         btermEnd.bfactor = checkBfactor()
         btermEnd.btermEnd = checkBtermEnd()
         return btermEnd
@@ -645,7 +667,6 @@ return: bfactor (bfactorNode)
 def checkBfactor():
     print("Bfactor: {}".format(current))
     tokenType = checkFIRST("bfactor")
-    print(tokenType)
     bfactor = nodes.bfactorNode()
 
     if tokenType == "not":
@@ -677,19 +698,16 @@ def checkBfactor():
                 match(["operator", "="])
                 match(["operator", "="])
             else:
-                # TODO: throw error here!
-                print("error bfactor line 368")
-            #TODO fix error with reading comp when it's the last character in lexer!!
+                final_errors.append('syntax error (line {}): expected comparator, recieved "{}"\n'.format(current[2], current[1]))
             e2 = checkExpr()
             bcomp = nodes.bcompNode(e1, comp, e2)
             bfactor.bcomp = bcomp
         else:
-            #TODO log error here
-            print("error here bfactor 2.3")
-        match(['delim', ')'])
+            final_errors.append('syntax error (line {}): error parsing for boolean expression/expression in boolean factor\n'.format(current[2], current[1]))
+        if not match(['delim', ')']):
+            final_errors.append('syntax error (line {}): expected ")", recieved "{}"\n'.format(current[2], current[1]))
     else:
-        #TODO log error here
-        print("eror here bfactor 3.3")
+        final_errors.append('syntax error (line {}): invalid boolean factor\n'.format(current[2], current[1]))
     return bfactor
 
 '''
@@ -755,8 +773,9 @@ def checkFactor():
             factor.type = "expr"
             factor.node = checkExpr()
             if not match(['delim', ')']):
-                print("error line 717")
-                #TODO: add error saving
+                final_errors.append('syntax error (line {}): expected ";" after declaration, recieved "{}"\n'.format(current[2], current[1]))
+    else: 
+        final_errors.append('syntax error (line {}): invalid factor\n'.format(current[2]))
     return factor
 
 '''
@@ -772,11 +791,27 @@ def checkFuncCall():
     if tokenType != "":
         fcall.fname = current[1]
         matchType(ID)
-        match(['delim', '('])
+        if not match(['delim', '(']):
+            final_errors.append('syntax error (line {}): expected "(" before function call, recieved "{}"\n'.format(current[2], current[1]))
         fcall.exprSeq = checkExprSeq()
-        match(['delim', ')'])
+        if not match(['delim', ')']):
+            final_errors.append('syntax error (line {}): expected ")" before function call, recieved "{}"\n'.format(current[2], current[1]))
     return fcall
 
+'''
+#* print results from program and final_errors array
+params: 
+- program = program AST
+- final_errors = array of errors
+return: -
+'''
+def printFinals(program, final_errors):
+    print('Final Program')
+    print(program)
+    print('~'*10)
+    print('Final Errors')
+    for error in final_errors:
+        print(error.strip())
+
 #* MAIN
-# print("("=="not")
 parse()

@@ -226,11 +226,11 @@ def checkFDef():
             param = checkParam()
             fdef.params.append(param)
             matchedComma = match(['delim', ','])
-            if not matchedComma and checkFIRSTCustom("params", lookahead[1]) != "":
+            if not matchedComma and checkFIRSTCustom("params", lookahead) != "":
             # no comma, but another param
                 final_errors.append('syntax error (line {}): expected comma when multiple parameters, recieved "{}"\n'.format(current[2], current[1]))
                 nextToken()
-            elif matchedComma and checkFIRSTCustom("params", current[1]) == "":
+            elif matchedComma and checkFIRSTCustom("params", current) == "":
                 # comma, but no more params
                 final_errors.append('syntax error (line {}): expected another parameter after comma, recieved "{}"\n'.format(current[2], current[1]))
         
@@ -553,7 +553,7 @@ def checkExprSeqEnd():
     nodes = []
 
     if tokenType != "":
-        if match(['delim', ',']) and not checkFIRST("exprSeqEnd"):
+        if match(['delim', ',']) and not checkFIRST("exprSeq"):
             final_errors.append('syntax error (line {}): invalid follow after comma in expression sequence, recieved "{}"\n'.format(current[2], current[1]))
         exprs = checkExprSeq()
         nodes.extend(exprs)

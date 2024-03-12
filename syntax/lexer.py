@@ -332,6 +332,7 @@ def readBuffer(buffer):
 writes final errors and token-lexeme pairs into respective txt files
 params: -
 return: final_array_lexer = array of token-lexeme array pairs for parser
+error = if there are errors (if final_errors has any entries) 
 '''
 def runLexer():
     global buffA, buffB, currBuff
@@ -394,7 +395,8 @@ def runLexer():
     output_errors.writelines(final_errors)
     output_errors.close()
     
-    return final_array_lexer
+    print(len(final_errors) > 0)
+    return final_array_lexer, len(final_errors) > 0
 
 '''
 #* print <token, lexeme> pairs and error results from all 3 result arrays

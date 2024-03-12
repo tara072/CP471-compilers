@@ -394,7 +394,7 @@ def runLexer():
     output_errors.writelines(final_errors)
     output_errors.close()
     
-    return final_array_lexer
+    return final_array_lexer, len(final_errors) > 0
 
 '''
 #* print <token, lexeme> pairs and error results from all 3 result arrays

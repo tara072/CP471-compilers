@@ -48,7 +48,7 @@ DOUBLEE = "doubleE"
 final_errors = []
 
 # getting array of lexemes from lexer
-lexemes = runLexer()
+lexemes, lexError = runLexer()
 # print(lexemes)
 
 # index of current token
@@ -157,9 +157,16 @@ def matchType(tokenType):
 '''
 #* parse through the program
 params: -
-return: -
+return: program AST tree, error (if any errors)
 '''
 def parse():
+    if lexError:
+        # write error to error output file
+        output_errors = open('files/syntax_errors.txt', 'w')
+        output_errors.writelines("Lexical errors, cannot proceed with syntax analysis.")
+        output_errors.close()
+        print("Lexical errors, cannot proceed with syntax analysis.")
+        return None
     print("parse: {}".format(current))
     try:
         program = nodes.Program()
@@ -175,7 +182,7 @@ def parse():
             output_errors = open('files/syntax_errors.txt', 'w')
             output_errors.writelines(final_errors)
             output_errors.close()
-            return program
+            return program, len(final_errors) > 0
         else:
             final_errors.append('syntax error (line {}): illegal lexeme ({}) for program\n'.format(current[2], current[1]))
             printFinals(program, final_errors)

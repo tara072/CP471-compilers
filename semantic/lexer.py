@@ -395,7 +395,6 @@ def runLexer():
     output_errors.writelines(final_errors)
     output_errors.close()
     
-    print(len(final_errors) > 0)
     return final_array_lexer, len(final_errors) > 0
 
 '''

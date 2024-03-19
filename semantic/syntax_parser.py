@@ -185,7 +185,7 @@ def parse():
             return program, len(final_errors) > 0
         else:
             final_errors.append('syntax error (line {}): illegal lexeme ({}) for program\n'.format(current[2], current[1]))
-            printFinals(program, final_errors)
+            # printFinals(program, final_errors)
     except Exception as e:
         print(e)
         final_errors.append('error: {}\n'.format(e))
@@ -306,6 +306,7 @@ def checkDecl():
 
     if tokenType != "":
         node.type = current[:2]
+        node.line = current[2]
         match(current[:2])
         if not checkFIRST("varlist"):
             final_errors.append('syntax error (line {}): expected variable name after declaration, recieved "{}"\n'.format(current[2], current[1]))
@@ -821,4 +822,4 @@ def printFinals(program, final_errors):
         print(error.strip())
 
 #* MAIN
-parse()
+# parse()

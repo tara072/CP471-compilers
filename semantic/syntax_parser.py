@@ -73,8 +73,8 @@ def nextToken():
     else: 
         # return "EOF" when current token is final 
         lookahead = "EOF"
-    print("nextToken new current: {}".format(current))
-    print("nextToken new lookahead: {}".format(lookahead))
+    # print("nextToken new current: {}".format(current))
+    # print("nextToken new lookahead: {}".format(lookahead))
 
 '''
 #* check the FIRSTSET for grammar operations
@@ -87,22 +87,22 @@ def checkFIRST(nonTerm):
 
         if firsts:
             if ((current[0] == ID or current[0] == INT or current[0] == DOUBLE or current[0] == DOUBLEE) and current[0] in firsts):
-                print("FIRST: {}".format(current[0]))
+                # print("FIRST: {}".format(current[0]))
                 return current[0]
             elif (current[1] in firsts):
-                print("FIRST: {}".format(current[1]))
+                # print("FIRST: {}".format(current[1]))
                 return current[1]
             else:
-                print("FIRST: null")
+                # print("FIRST: null")
                 return ""
         else:
-            print("FIRST: null")
+            # print("FIRST: null")
             return ""
     except KeyError:
-        print("KeyError")
+        # print("KeyError")
         return ""
     except Exception as e:
-        print(e)
+        # print(e)
         return ""
     
 def checkFIRSTCustom(nonTerm, customValue):
@@ -111,22 +111,22 @@ def checkFIRSTCustom(nonTerm, customValue):
 
         if firsts:
             if ((customValue[0] == ID or customValue[0] == INT or customValue[0] == DOUBLE or customValue[0] == DOUBLEE) and customValue[0] in firsts):
-                print("FIRST: {}".format(customValue[0]))
+                # print("FIRST: {}".format(customValue[0]))
                 return customValue[0]
             elif (customValue[1] in firsts):
-                print("FIRST: {}".format(customValue[1]))
+                # print("FIRST: {}".format(customValue[1]))
                 return customValue[1]
             else:
-                print("FIRST: null")
+                # print("FIRST: null")
                 return ""
         else:
-            print("FIRST: null")
+            # print("FIRST: null")
             return ""
     except KeyError:
-        print("KeyError")
+        # print("KeyError")
         return ""
     except Exception as e:
-        print(e)
+        # print(e)
         return ""
 
 '''
@@ -136,9 +136,9 @@ return: boolean of if the current token has been matched and consumed
 '''
 def match(token):
     if token == current[:2]:
-        print("matched {} and {}".format(token, current))
+        # print("matched {} and {}".format(token, current))
         nextToken()
-        print("new current: {}".format(current))
+        # print("new current: {}".format(current))
         return True
     return False
 
@@ -165,9 +165,9 @@ def parse():
         output_errors = open('files/syntax_errors.txt', 'w')
         output_errors.writelines("Lexical errors, cannot proceed with syntax analysis.")
         output_errors.close()
-        print("Lexical errors, cannot proceed with syntax analysis.")
+        # print("Lexical errors, cannot proceed with syntax analysis.")
         return None
-    print("parse: {}".format(current))
+    # print("parse: {}".format(current))
     try:
         program = nodes.Program()
         tokenType = checkFIRST("program")
@@ -177,7 +177,7 @@ def parse():
             program.stmtSeq = checkStmtSeq()
             if not match(['delim', '.']):
                 final_errors.append('syntax error: expecting "." at the end of the program\n')
-            printFinals(program, final_errors)
+            # printFinals(program, final_errors)
             # write results to error output file
             output_errors = open('files/syntax_errors.txt', 'w')
             output_errors.writelines(final_errors)
@@ -187,7 +187,7 @@ def parse():
             final_errors.append('syntax error (line {}): illegal lexeme ({}) for program\n'.format(current[2], current[1]))
             # printFinals(program, final_errors)
     except Exception as e:
-        print(e)
+        # print(e)
         final_errors.append('error: {}\n'.format(e))
 
 '''
@@ -280,7 +280,7 @@ params: -
 return: nodes = list of decls (declNodes)
 '''
 def checkDeclarations():
-    print("checkDeclarations: {}".format(current))
+    # print("checkDeclarations: {}".format(current))
     nodes = []
     while current[1] != "EOF" and checkFIRST("declarations") != "":
         node = checkDecl()
@@ -300,7 +300,7 @@ params: -
 return: node (declNode)
 '''
 def checkDecl():
-    print("checkDecl: {}".format(current))
+    # print("checkDecl: {}".format(current))
     tokenType = checkFIRST("decl")
     node = nodes.declNode()
 
@@ -325,7 +325,7 @@ params: -
 return: nodes = array of decl (declNode)
 '''
 def checkDeclarationsEnd():
-    print("checkDeclarationsEnd: {}".format(current))
+    # print("checkDeclarationsEnd: {}".format(current))
     tokenType = checkFIRST("declarationsEnd")
     nodes = []
 
@@ -347,7 +347,7 @@ params: -
 return: list of vars (varNode)
 '''
 def checkVarlist():
-    print("checkVarlist: {}".format(current))
+    # print("checkVarlist: {}".format(current))
     tokenType = checkFIRST("varlist")
     nodes = []
 
@@ -367,7 +367,7 @@ params: -
 return: var (varNode)
 '''
 def checkVar():
-    print("checkVar: {}".format(current))
+    # print("checkVar: {}".format(current))
     tokenType = checkFIRST("var")
 
     if tokenType != "":
@@ -387,7 +387,7 @@ params: -
 return: -
 '''
 def checkVarEnd():
-    print("checkVarEnd: {}".format(current))
+    # print("checkVarEnd: {}".format(current))
     tokenType = checkFIRST("varEnd")
     if tokenType != "":
         match(['delim', '['])
@@ -405,7 +405,7 @@ params: -
 return: list of vars (varNode)
 '''
 def checkVarlistEnd():
-    print("checkVarlistEnd: {}".format(current))
+    # print("checkVarlistEnd: {}".format(current))
     tokenType = checkFIRST("varlistEnd")
     nodes = []
 
@@ -420,7 +420,7 @@ params: -
 return: statements = list of statements
 '''
 def checkStmtSeq():
-    print("StmtSeq: {}".format(current))
+    # print("StmtSeq: {}".format(current))
     statements = []
 
     while current[1] != "EOF" and checkFIRST("statementSeq") != "":
@@ -450,7 +450,7 @@ params: -
 return: statements = list of statements
 '''
 def checkStmtSeqEnd():
-    print("StmtSeqEnd: {}".format(current))
+    # print("StmtSeqEnd: {}".format(current))
     tokenType = checkFIRST("statementSeqEnd")
     statements = []
 
@@ -471,7 +471,7 @@ def checkStmtSeqEnd():
     return: statement node
 '''
 def checkStatement():
-    print("Statement: {}".format(current))
+    # print("Statement: {}".format(current))
     tokenType = checkFIRST("statement")
     stmt = None
     # assignment statement <stmt> := <var> = <expr>
@@ -539,7 +539,7 @@ params: -
 return: list of expr (exprNodes)
 '''
 def checkExprSeq():
-    print("ExprSeq: {}".format(current))
+    # print("ExprSeq: {}".format(current))
     tokenType = checkFIRST("exprSeq")
     nodes = []
 
@@ -556,7 +556,7 @@ params: -
 return: list of exprNodes
 '''
 def checkExprSeqEnd():
-    print("ExprSeqEnd: {}".format(current))
+    # print("ExprSeqEnd: {}".format(current))
     tokenType = checkFIRST("exprSeqEnd")
     nodes = []
 
@@ -573,7 +573,7 @@ params: -
 return: expr (exprNode)
 '''
 def checkExpr():
-    print("Expr: {}".format(current))
+    # print("Expr: {}".format(current))
     tokenType = checkFIRST("expr")
     expr = nodes.exprNode()
     if tokenType != "":
@@ -587,7 +587,7 @@ params: -
 return exprEnd (exprEndNode)
 '''
 def checkExprEnd():
-    print("ExprEnd: {}".format(current))
+    # print("ExprEnd: {}".format(current))
     tokenType = checkFIRST("exprEnd")
     if tokenType != "":
         exprEnd = nodes.exprEndNode()
@@ -605,7 +605,7 @@ params: -
 return: bexpr = bexprNode
 '''
 def checkBexpr():
-    print("Bexpr: {}".format(current))
+    # print("Bexpr: {}".format(current))
     tokenType = checkFIRST("bexpr")
     bexpr = nodes.bexprNode()
 
@@ -621,7 +621,7 @@ params: -
 return: bexprEnd (bexprEndNode) | none
 '''
 def checkBexprEnd():
-    print("BexprEnd: {}".format(current))
+    # print("BexprEnd: {}".format(current))
     tokenType = checkFIRST("bexprEnd")
     if tokenType != "":
         bexprEnd = nodes.bexprEndNode()
@@ -638,7 +638,7 @@ params: -
 return: bterm (btermNode)
 '''
 def checkBterm():
-    print("Bterm: {}".format(current))
+    # print("Bterm: {}".format(current))
     tokenType = checkFIRST("bterm")
     bterm = nodes.btermNode()
 
@@ -654,7 +654,7 @@ params: -
 return: btermEnd (btermEndNode) | none
 '''
 def checkBtermEnd():
-    print("BtermEnd: {}".format(current))
+    # print("BtermEnd: {}".format(current))
     tokenType = checkFIRST("btermEnd")
 
     if tokenType != "":
@@ -673,7 +673,7 @@ params: -
 return: bfactor (bfactorNode)
 '''
 def checkBfactor():
-    print("Bfactor: {}".format(current))
+    # print("Bfactor: {}".format(current))
     tokenType = checkFIRST("bfactor")
     bfactor = nodes.bfactorNode()
 
@@ -724,7 +724,7 @@ params: -
 return: term (termNode)
 '''
 def checkTerm():
-    print("Term: {}".format(current))
+    # print("Term: {}".format(current))
     tokenType = checkFIRST("term")
     term = nodes.termNode()
     if tokenType != "":
@@ -738,7 +738,7 @@ params: -
 return: termEnd = (termEndNode)
 '''
 def checkTermEnd():
-    print("TermEnd: {}".format(current))
+    # print("TermEnd: {}".format(current))
     tokenType = checkFIRST("termEnd")
     if tokenType != "":
         termEnd = nodes.termEndNode()
@@ -761,7 +761,7 @@ def checkTermEnd():
     return: factor (factorNode)
 '''
 def checkFactor():
-    print("Factor: {}".format(current))
+    # print("Factor: {}".format(current))
     tokenType = checkFIRST("factor")
     factor = nodes.factorNode()
     if tokenType != "":
@@ -792,7 +792,7 @@ params: -
 return: fcall (fCallNode)
 '''
 def checkFuncCall():
-    print("FuncCall: {}".format(current))
+    # print("FuncCall: {}".format(current))
     tokenType = checkFIRST("fname")
     fcall = nodes.fCallNode()
 

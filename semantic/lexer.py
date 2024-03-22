@@ -354,6 +354,7 @@ def runLexer():
                 final_lexer.append('<{}, {}>\n'.format(getKeywordToken(''.join(chr(c) for c in buffA[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffA[cont_point:])))
                 final_array_lexer.append([getKeywordToken(''.join(chr(c) for c in buffA[cont_point:]), KEYWORDS), ''.join(chr(c) for c in buffA[cont_point:]), line])
             elif curr_state == 11:
+                print("HERE")
                 final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
                 final_array_lexer.append(['int', ''.join(chr(c) for c in buffA[cont_point:]), line])
             elif curr_state == 13:

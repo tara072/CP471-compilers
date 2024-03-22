@@ -221,19 +221,22 @@ class termEndNode:
 <factor> ::= <var> | <number> | (<expr>) | <fname>(<exprseq>)
     - type = factor type (var, number, expr, function) (token type / stirng)
     - node = node of factor? (varNode, ?, exprNode, or fdefNode?)
+    - negative = if it's a negative (for numbers)
 
 '''
 class factorNode:
     def __init__(self):
         self.type = ""
         self.node = None
+        self.negative = False
         self.line = 0
     
     def __str__(self):
         return('''factorNode:
     factorNode/type: {}
+    factorNode/negative: {}
     factorNode/node:
-    --> node/{} '''.format(self.type, self.node))
+    --> node/{} '''.format(self.type, self.negative, self.node))
     
 '''
 #* assignment statement node

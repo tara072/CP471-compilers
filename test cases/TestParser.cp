@@ -6,5 +6,5 @@ return(gcd(a-b,b)) else return(gcd(a,b-a)) fi fed;
 int c, d; double e;
 print gcd(21,15);
 print 45; print 2*(gcd(21, 28) + 6);
-c = 10;
-d = gcd(1,2).
+c = -9;
+d = gcd(1,2.2).

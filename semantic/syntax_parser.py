@@ -165,7 +165,7 @@ def parse():
         output_errors = open('files/syntax_errors.txt', 'w')
         output_errors.writelines("Lexical errors, cannot proceed with syntax analysis.")
         output_errors.close()
-        # print("Lexical errors, cannot proceed with syntax analysis.")
+        print("Lexical errors, cannot proceed with syntax analysis.")
         return None
     # print("parse: {}".format(current))
     try:
@@ -177,7 +177,7 @@ def parse():
             program.stmtSeq = checkStmtSeq()
             if not match(['delim', '.']):
                 final_errors.append('syntax error: expecting "." at the end of the program\n')
-            # printFinals(program, final_errors)
+            printFinals(program, final_errors)
             # write results to error output file
             output_errors = open('files/syntax_errors.txt', 'w')
             output_errors.writelines(final_errors)
@@ -445,7 +445,6 @@ def checkStmtSeq():
         final_errors.append('syntax error (line {}): function declarations should be before declarations and statements, recieved "{}"\n'.format(current[2], current[1]))
     elif checkFIRST("declarations"):
         final_errors.append('syntax error (line {}): declarations should be before statements, recieved "{}"\n'.format(current[2], current[1]))
-
     return statements
 
 '''
@@ -483,9 +482,13 @@ def checkStatement():
         if lookahead[1] == "=":
             varNode = checkVar()
             match(['operator', '='])
+            if current[1] == "-":
+                match(['expr', '-'])
+                isNegative = True
             if checkFIRST("expr") == "":
                 final_errors.append('syntax error (line {}): expected expression after "=", recieved "{}"\n'.format(current[2], current[1]))
             exprNode = checkExpr()
+            if isNegative: exprNode.term.factor.negative = True
             stmt = nodes.assignStmtNode(varNode, exprNode)
         else:
             final_errors.append('syntax error (line {}): expected "=" after variable, recieved "{}"\n'.format(current[2], current[1]))
@@ -833,4 +836,4 @@ def printFinals(program, final_errors):
         print(error.strip())
 
 #* MAIN
-# parse()
+parse()

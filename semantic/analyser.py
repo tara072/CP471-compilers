@@ -19,7 +19,6 @@ def analyse():
     for dec in program.decls:
         for var in dec.varlist:
             vSym = symbol_table.varSymbol(var.id[1], dec.type[1], var.line)
-            print(vSym)
             if vSym.id not in rootTable.variables:
                 rootTable.variables[vSym.id] = vSym
             else:
@@ -40,7 +39,6 @@ def analyse():
             fdef.line
         )
         fSym.table.parentTable = rootTable
-        print(fSym)
         
         if fSym.name in rootTable.functions:
             print("Multiple declaractions of function name {} at line {}".format(fSym.name, fSym.line))
@@ -49,7 +47,6 @@ def analyse():
             rootTable.functions[fSym.name] = fSym
             for param in fdef.params:
                 vSym = symbol_table.varSymbol(param.var.id[1], param.type[1], param.var.line)
-                print(vSym)
 
                 if vSym.id in fSym.table.variables:
                     print("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
@@ -197,7 +194,6 @@ def evalFactor(factor, table):
     elif factor.type == "expr":
         return evalExpr(factor.node, table)
     elif factor.type == "funcCall":
-        print("HERE")
         fCallNode = factor.node
         funcSym = funcLookup(fCallNode.fname, table)
         if funcSym is None:

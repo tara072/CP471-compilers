@@ -45,6 +45,7 @@ class fdefNode:
         self.params = []
         self.decls = [] 
         self.stmtSeq = []
+        self.line = 0
 
     def __str__(self):
         paramsStr = ''
@@ -95,6 +96,7 @@ class declNode:
     def __init__(self):
         self.type = []
         self.varlist = []
+        self.line = 0
     
     def __str__(self):
         varStr = ''
@@ -103,8 +105,10 @@ class declNode:
         return('''declNode:
     declNode/type:
     --> type/{}
+    declNode/line:
+    --> line/{}
     declNode/varlist:
-    --> varlist/{}'''.format(self.type, varStr))
+    --> varlist/{}'''.format(self.type, self.line, varStr))
 
 '''
 #* var node
@@ -113,10 +117,11 @@ class declNode:
 '''
 class varNode:
     def __init__(self, token):
-        self.id = token
+        self.id = token[:2]
+        self.line = token[2]
 
     def __str__(self):
-        return('varNode: {} '.format(self.id[:2]))
+        return('varNode: {} '.format(self.id))
 
 '''
 #* var end node
@@ -142,6 +147,7 @@ class exprNode:
     def __init__(self):
         self.term = None
         self.exprEnd = None
+        self.line = 0
     
     def __str__(self):
         return('''exprNode:
@@ -161,6 +167,7 @@ class exprEndNode:
         self.op = ''
         self.term = None
         self.exprE = None
+        self.line = 0
 
     def __str__(self):
         return ('''exprEndNode:
@@ -180,13 +187,15 @@ class termNode:
     def __init__(self):
         self.factor = None
         self.termEnd = None
+        self.line = 0
     
     def __str__(self):
         return('''termNode:
+    termNode/line: {}
     termNode/factor:
     --> factor/{}
     termNode/termEnd:
-    --> termEnd/{} '''.format(self.factor, self.termEnd))
+    --> termEnd/{} '''.format(self.line, self.factor, self.termEnd))
 
 '''
 #* term end node
@@ -218,6 +227,7 @@ class factorNode:
     def __init__(self):
         self.type = ""
         self.node = None
+        self.line = 0
     
     def __str__(self):
         return('''factorNode:
@@ -306,9 +316,10 @@ print <expr> | return <expr>
     - expr (exprNode)
 '''
 class builtStmt:
-    def __init__(self, tokenType, expr):
+    def __init__(self, tokenType, expr, line):
         self.type = tokenType
         self.expr = expr
+        self.line = line
     
     def __str__(self):
         return('''\n-----------
@@ -421,6 +432,7 @@ class bcompNode:
         self.comp = comp
         self.expr1 = expr1
         self.expr2 = expr2
+        self.line = 0
 
     def __str__(self):
         return('''bcompNode:
@@ -439,6 +451,7 @@ class fCallNode:
     def __init__(self):
         self.fname = ""
         self.exprSeq = []
+        self.line = 0
     
     def __str__(self):
         exprStr = ''

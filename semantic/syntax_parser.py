@@ -215,6 +215,7 @@ return: fdef (fdefNode)
 def checkFDef():
     fdef = nodes.fdefNode()
     if match(['fdec', 'def']):
+        fdef.line = current[2]
         if checkFIRST("type") == "":
             final_errors.append('syntax error (line {}): expected function return type after def, recieved "{}"\n'.format(current[2], current[1]))
         # match function return type
@@ -263,8 +264,11 @@ return: param (paramNode)
 '''
 def checkParam():
     param = nodes.paramNode()
-    if match(['type', 'int']) or match([['type', 'double']]):
-        param.type = current
+    if match(['type', 'int']):
+        param.type = ['type', 'int']
+        param.var = checkVar()
+    elif match([['type', 'double']]):
+        param.type = ['type', 'double']
         param.var = checkVar()
     else:
         final_errors.append('syntax error (line {}): expected a type for param, recieved "{}"\n'.format(current[2], current[1]))
@@ -517,16 +521,18 @@ def checkStatement():
     # built in statement print <expr> 
     elif tokenType == "print":
         tt = current[:2]
+        line = current[2]
         match(['statement', 'print'])
         expr = checkExpr()
-        stmt = nodes.builtStmt(tt, expr)
+        stmt = nodes.builtStmt(tt, expr, line)
 
     # built in statement return <expr>
     elif tokenType == "return":
         tt = current[:2]
+        line = current[2]
         match(['statement', 'return'])
         expr = checkExpr()
-        stmt = nodes.builtStmt(tt, expr)
+        stmt = nodes.builtStmt(tt, expr, line)
 
     else:
         final_errors.append('syntax error (line {}): invalid start of statement, recieved "{}"\n'.format(current[2], current[1]))
@@ -577,6 +583,7 @@ def checkExpr():
     tokenType = checkFIRST("expr")
     expr = nodes.exprNode()
     if tokenType != "":
+        expr.line = current[2]
         expr.term = checkTerm()
         expr.exprEnd = checkExprEnd()
     return expr
@@ -592,6 +599,7 @@ def checkExprEnd():
     if tokenType != "":
         exprEnd = nodes.exprEndNode()
         exprEnd.op = current[:2]
+        exprEnd.line = current[2]
         match(current[:2])
         exprEnd.term = checkTerm()
         exprEnd.exprE = checkExprEnd()
@@ -728,6 +736,7 @@ def checkTerm():
     tokenType = checkFIRST("term")
     term = nodes.termNode()
     if tokenType != "":
+        term.line = current[2]
         term.factor = checkFactor()
         term.termEnd = checkTermEnd()
     return term
@@ -765,6 +774,7 @@ def checkFactor():
     tokenType = checkFIRST("factor")
     factor = nodes.factorNode()
     if tokenType != "":
+        factor.line = current[2]
         if tokenType == ID:
             if lookahead[1] == "(":
                 factor.type = "funcCall"
@@ -798,6 +808,7 @@ def checkFuncCall():
 
     if tokenType != "":
         fcall.fname = current[1]
+        fcall.line = current[2]
         matchType(ID)
         if not match(['delim', '(']):
             final_errors.append('syntax error (line {}): expected "(" before function call, recieved "{}"\n'.format(current[2], current[1]))

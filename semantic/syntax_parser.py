@@ -166,7 +166,7 @@ def parse():
         output_errors.writelines("Lexical errors, cannot proceed with syntax analysis.")
         output_errors.close()
         print("Lexical errors, cannot proceed with syntax analysis.")
-        return None
+        return None, True
     # print("parse: {}".format(current))
     try:
         program = nodes.Program()
@@ -185,10 +185,14 @@ def parse():
             return program, len(final_errors) > 0
         else:
             final_errors.append('syntax error (line {}): illegal lexeme ({}) for program\n'.format(current[2], current[1]))
+            nextToken()
             # printFinals(program, final_errors)
+            # return None, True
     except Exception as e:
-        # print(e)
+        print("HERE")
+        print(e)
         final_errors.append('error: {}\n'.format(e))
+    return None, True
 
 '''
 #* check function declarations
@@ -482,6 +486,7 @@ def checkStatement():
         if lookahead[1] == "=":
             varNode = checkVar()
             match(['operator', '='])
+            isNegative = False
             if current[1] == "-":
                 match(['expr', '-'])
                 isNegative = True

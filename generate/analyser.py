@@ -365,4 +365,4 @@ def outputErrors(errs):
     output_errors.close()
 
 #* MAIN
-analyse()
+# analyse()

@@ -12,7 +12,7 @@ final_errors = []
 final_array_lexer = []
 
 #* enter code file here!
-code_data = open('test cases/TestParser.cp', 'r')
+code_data = open('test cases/TestGen.cp', 'r')
 
 # # state tracking
 curr_state = 0
@@ -411,12 +411,12 @@ def printFinals(final_lexer, final_errors, final_array_lexer):
     for lex in final_lexer:
         print(lex.strip())
     print('='*10)
-    print('Final Errors')
-    for error in final_errors:
-        print(error.strip())
-    print('='*10)
     print('Final Array Lexer')
     for lex in final_array_lexer:
         print(lex)
+    print('='*10)
+    print('Final Errors')
+    for error in final_errors:
+        print(error.strip())
 
-runLexer()
+# runLexer()

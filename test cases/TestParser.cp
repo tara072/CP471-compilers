@@ -3,6 +3,15 @@ gcd(int a, int b)
 if (a==b) then return (a)
 fi; if (a>b) then
 return(gcd(a-b,b)) else return(gcd(a,b-a)) fi fed;
+def int
+max(int x, int y)
+int z;
+if (x>y) then
+z = x
+else
+z = y
+fi;
+return (z) fed;
 int c, d; double e;
 print gcd(21,15);
 print 45; print 2*(gcd(21, 28) + 6);

@@ -9,7 +9,7 @@ def int max(int x, int y)
 fed;
 
 int a,b,c,d;
-m = 2;
+a = 2;
 b = a * 2 -3;
 c = b/a + 1;
 d = max(max(a,b),c);

@@ -356,6 +356,15 @@ def runLexer():
             elif curr_state == 11:
                 final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
                 final_array_lexer.append(['int', ''.join(chr(c) for c in buffA[cont_point:]), line])
+
+            elif curr_state == 12:
+                final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:-1])))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in buffA[cont_point:-1]), line])
+                if buffA[-1] == 46:
+                    final_lexer.append('<int, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:-1])))
+                final_array_lexer.append(['int', ''.join(chr(c) for c in buffA[cont_point:-1]), line])
+                print(buffA[-1])
+                print(''.join(chr(buffA[-1])))
             elif curr_state == 13:
                 final_lexer.append('<double, {}>\n'.format(''.join(chr(c) for c in buffA[cont_point:])))
                 final_array_lexer.append(['double', ''.join(chr(c) for c in buffA[cont_point:]), line])

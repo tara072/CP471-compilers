@@ -53,6 +53,15 @@ def analyse():
                     final_errors.append("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
                 else:
                     fSym.table.variables[vSym.id] = vSym
+            for decl in fdef.decls:
+                print(decl)
+                vSym = symbol_table.varSymbol(decl.varlist[0].id[1], decl.type[1], decl.line)
+
+                if vSym.id in fSym.table.variables:
+                    print("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))
+                    final_errors.append("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))
+                else:
+                    fSym.table.variables[vSym.id] = vSym
             analyseStmts(fdef.stmtSeq, rootTable, fSym)
 
     # analyse statements (recursively)

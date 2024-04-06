@@ -18,7 +18,7 @@ def analyse():
     # analyse declarations
     for dec in program.decls:
         for var in dec.varlist:
-            vSym = symbol_table.varSymbol(var.id[1], dec.type[1], var.line)
+            vSym = symbol_table.varSymbol(var.id[1], dec.type[1], var.line, "decl")
             if vSym.id not in rootTable.variables:
                 rootTable.variables[vSym.id] = vSym
             else:
@@ -46,7 +46,7 @@ def analyse():
         else:
             rootTable.functions[fSym.name] = fSym
             for param in fdef.params:
-                vSym = symbol_table.varSymbol(param.var.id[1], param.type[1], param.var.line)
+                vSym = symbol_table.varSymbol(param.var.id[1], param.type[1], param.var.line, "param")
 
                 if vSym.id in fSym.table.variables:
                     print("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
@@ -54,7 +54,7 @@ def analyse():
                 else:
                     fSym.table.variables[vSym.id] = vSym
             for decl in fdef.decls:
-                vSym = symbol_table.varSymbol(decl.varlist[0].id[1], decl.type[1], decl.line)
+                vSym = symbol_table.varSymbol(decl.varlist[0].id[1], decl.type[1], decl.line, "decl")
 
                 if vSym.id in fSym.table.variables:
                     print("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))

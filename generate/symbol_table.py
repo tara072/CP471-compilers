@@ -48,17 +48,19 @@ parentTable: {}
 '''
 # variable
 class varSymbol:
-    def __init__(self, lex, dataType, line):
+    def __init__(self, lex, dataType, line, varType):
         self.id = lex #string
         self.type = dataType #type
         self.line = line #int
+        self.varType = varType #param or variable
 
     def __str__(self):
         return ('''varSymbol:
     id: {}
     type: {}
     line: {}
-'''.format(self.id, self.type, self.line))
+    varType: {}
+'''.format(self.id, self.type, self.line, self.varType))
 
 '''
 #* function symbol

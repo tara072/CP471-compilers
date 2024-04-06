@@ -27,7 +27,7 @@ def analyse():
             if vSym.id not in rootTable.variables:
                 rootTable.variables[vSym.id] = vSym
             else:
-                print("Multiple declaractions of variable {} at line {}".format(vSym.id, vSym.line))
+                # print("Multiple declaractions of variable {} at line {}".format(vSym.id, vSym.line))
                 final_errors.append("Multiple declaractions of variable {} at line {}".format(vSym.id, vSym.line))
     
     # analyse function declarations
@@ -46,7 +46,7 @@ def analyse():
         fSym.table.parentTable = rootTable
         
         if fSym.name in rootTable.functions:
-            print("Multiple declaractions of function name {} at line {}".format(fSym.name, fSym.line))
+            # print("Multiple declaractions of function name {} at line {}".format(fSym.name, fSym.line))
             final_errors.append("Multiple declaractions of function name {} at line {}".format(fSym.name, fSym.line))
         else:
             rootTable.functions[fSym.name] = fSym
@@ -54,7 +54,7 @@ def analyse():
                 vSym = symbol_table.varSymbol(param.var.id[1], param.type[1], param.var.line, "param")
 
                 if vSym.id in fSym.table.variables:
-                    print("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
+                    # print("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
                     final_errors.append("Multiple declaractions of parameter with name {} at line {}".format(vSym.id, vSym.line))
                 else:
                     fSym.table.variables[vSym.id] = vSym
@@ -62,7 +62,7 @@ def analyse():
                 vSym = symbol_table.varSymbol(decl.varlist[0].id[1], decl.type[1], decl.line, "decl")
 
                 if vSym.id in fSym.table.variables:
-                    print("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))
+                    # print("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))
                     final_errors.append("Multiple declaractions of variable with name {} at line {}".format(vSym.id, vSym.line))
                 else:
                     fSym.table.variables[vSym.id] = vSym
@@ -95,15 +95,15 @@ def analyseStmts(stmtSeq, table, funcSym):
         if isinstance(stmt, nodes.assignStmtNode):
             varSym = varLookup(stmt.var.id[1], currentTable)
             if varSym is None:
-                print("Assignment before declaration of variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
+                # print("Assignment before declaration of variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
                 final_errors.append("Assignment before declaration of variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
             else:
                 valid, exprType = evalExpr(stmt.expr, currentTable)
                 if not valid:
-                    print("Invalid statement at line {}".format(stmt.var.line))
+                    # print("Invalid statement at line {}".format(stmt.var.line))
                     final_errors.append("invalid statement at line {}".format(stmt.var.line))
                 if varSym.type != exprType:
-                    print("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
+                    # print("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
                     final_errors.append("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
         elif isinstance(stmt, nodes.ifStmtNode):
             evalBexpr(stmt.bexpr, currentTable)
@@ -117,7 +117,7 @@ def analyseStmts(stmtSeq, table, funcSym):
             if stmt.type[1] == "return":
                 valid, returnType = evalExpr(stmt.expr, funcSym.table)
                 if valid and (returnType != funcSym.returnType):
-                    print("Invalid return type {} at line {}".format(returnType, stmt.line))
+                    # print("Invalid return type {} at line {}".format(returnType, stmt.line))
                     final_errors.append("Invalid return type {} at line {}".format(returnType, stmt.line))
             elif stmt.type[1] == "print":
                 evalExpr(stmt.expr, currentTable)
@@ -140,7 +140,7 @@ def evalExpr(expr, table):
         valid, endTermType = evalExprEnd(expr.exprEnd, table)
         if termType != endTermType:
             valid = False
-            print("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.exprEnd.line))
+            # print("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.exprEnd.line))
             final_errors.append("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.exprEnd.line))
 
     return True, termType
@@ -164,7 +164,7 @@ def evalExprEnd(expr, table):
 
         if termType != termEndType:
             valid = False
-            print("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.line))
+            # print("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.line))
             final_errors.append("Cannot perform {} with two different types at line {}".format(expr.exprEnd.op, expr.line))
     return valid, termType
 
@@ -186,7 +186,7 @@ def evalTerm(term, table):
         valid, endFactorType = evalFactor(term.termEnd.factor, table)
         if factorType != endFactorType:
             valid = False
-            print("Cannot perform {} with two different types at line {}".format(term.termEnd.op, term.line))
+            # print("Cannot perform {} with two different types at line {}".format(term.termEnd.op, term.line))
             final_errors.append("Cannot perform {} with two different types at line {}".format(term.termEnd.op, term.line))
     return valid, factorType
 
@@ -211,22 +211,22 @@ def evalFactor(factor, table):
         fCallNode = factor.node
         funcSym = funcLookup(fCallNode.fname, table)
         if funcSym is None:
-            print("Function {} called but not declared at line {}".format(fCallNode.fname, fCallNode.line))
+            # print("Function {} called but not declared at line {}".format(fCallNode.fname, fCallNode.line))
             final_errors.append("Function {} called but not declared at line {}".format(fCallNode.fname, fCallNode.line))
             return False, "UNDEFINED" # TODO: figure out what I want to return
         else:
             if len(fCallNode.exprSeq) != funcSym.paramCount:
-                print("Expected {} parameters but recieved {} at line {}".format(funcSym.paramCount, len(fCallNode.exprSeq), fCallNode.line))
+                # print("Expected {} parameters but recieved {} at line {}".format(funcSym.paramCount, len(fCallNode.exprSeq), fCallNode.line))
                 final_errors.append("Expected {} parameters but recieved {} at line {}".format(funcSym.paramCount, len(fCallNode.exprSeq), fCallNode.line))
             isRight = True
             for index in range(len(fCallNode.exprSeq)):
                 valid, paramType = evalExpr(fCallNode.exprSeq[index], table)
                 if not valid:
-                    print("Invalid parameter at line {}".format(fCallNode.line))
+                    # print("Invalid parameter at line {}".format(fCallNode.line))
                     final_errors.append("Invalid parameter at line {}".format(fCallNode.line))
                     isRight = False
                 if paramType != funcSym.paramTypes[index]:
-                    print("Wrong parameter type, expected {} but recieved {} at line {}".format(funcSym.paramTypes[index], paramType, fCallNode.line))
+                    # print("Wrong parameter type, expected {} but recieved {} at line {}".format(funcSym.paramTypes[index], paramType, fCallNode.line))
                     final_errors.append("Wrong parameter type, expected {} but recieved {} at line {}".format(funcSym.paramTypes[index], paramType, fCallNode.line))
             return isRight, funcSym.returnType
     elif factor.type == "var":
@@ -234,7 +234,7 @@ def evalFactor(factor, table):
         if varSym is not None:
             return True, varSym.type
         else:
-            print("Undeclared variable {} at line {}".format(factor.node.id[1], factor.node.line))
+            # print("Undeclared variable {} at line {}".format(factor.node.id[1], factor.node.line))
             final_errors.append("Undeclared variable {} at line {}".format(factor.node.id[1], factor.node.line))
     return False, "UNDEFINED"
 
@@ -290,7 +290,7 @@ def evalBfactor (bfactor, table):
         valid2, type2 = evalExpr(bfactor.bcomp.expr2, table)
         valid = valid1 and valid2 and type1 == type2
         if type1 != type2:
-            print("Cannot perform comparison with two different types at line {}".format(bfactor.bcomp.comp[2]))
+            # print("Cannot perform comparison with two different types at line {}".format(bfactor.bcomp.comp[2]))
             final_errors.append("Cannot perform comparison with two different types at line {}".format(bfactor.bcomp.comp[2]))
 
     return valid
@@ -365,4 +365,4 @@ def outputErrors(errs):
     output_errors.close()
 
 #* MAIN
-# analyse()
+analyse()

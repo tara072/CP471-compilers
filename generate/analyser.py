@@ -84,13 +84,14 @@ def analyseStmts(stmtSeq, table, funcSym):
             if varSym is None:
                 print("Assignment before declaration of variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
                 final_errors.append("Assignment before declaration of variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
-            valid, exprType = evalExpr(stmt.expr, currentTable)
-            if not valid:
-                print("Invalid statement at line {}".format(stmt.var.line))
-                final_errors.append("invalid statement at line {}".format(stmt.var.line))
-            if varSym.type != exprType:
-                print("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
-                final_errors.append("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
+            else:
+                valid, exprType = evalExpr(stmt.expr, currentTable)
+                if not valid:
+                    print("Invalid statement at line {}".format(stmt.var.line))
+                    final_errors.append("invalid statement at line {}".format(stmt.var.line))
+                if varSym.type != exprType:
+                    print("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
+                    final_errors.append("Invalid type assigned to variable {} at line {}".format(stmt.var.id[1], stmt.var.line))
         elif isinstance(stmt, nodes.ifStmtNode):
             evalBexpr(stmt.bexpr, currentTable)
             analyseStmts(stmt.stmtSeq, currentTable, funcSym)

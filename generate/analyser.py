@@ -68,7 +68,7 @@ def analyse():
     analyseStmts(program.stmtSeq, rootTable, None)
 
     # wrap up
-    printFinals(rootTable, final_errors)
+    # printFinals(rootTable, final_errors)
     # write results to error output file
     outputErrors(final_errors)
     return rootTable, program, len(final_errors) > 0

@@ -10,10 +10,15 @@ rootTable = symbol_table.symbolTable("root table")
 
 def analyse():
     if synError:
+            if isinstance(synError, str):
+                # print(synError)
+                outputErrors(synError)
+                return None, None, synError
+            else:
             # write error to error output file
-            outputErrors("Syntax errors, cannot proceed with semantic analysis.")
-            print("Syntax errors, cannot proceed with semantic analysis.")
-            return
+                outputErrors("Syntax errors, cannot proceed with semantic analysis.")
+                # print("Syntax errors, cannot proceed with semantic analysis.")
+                return None, None, "Syntax errors, cannot proceed with semantic analysis."
 
     # analyse declarations
     for dec in program.decls:

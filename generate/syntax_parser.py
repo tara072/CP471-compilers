@@ -234,8 +234,10 @@ def checkFDef():
             param = checkParam()
             fdef.params.append(param)
             matchedComma = match(['delim', ','])
-            if not matchedComma and checkFIRSTCustom("params", lookahead) != "":
-            # no comma, but another param
+            if not matchedComma and current[:2] != ['delim', ')'] and checkFIRSTCustom("params", lookahead) != "":
+                print(current)
+                print(lookahead)
+                # no comma, no bracket, but another param lookahead
                 final_errors.append('syntax error (line {}): expected comma when multiple parameters, recieved "{}"\n'.format(current[2], current[1]))
                 nextToken()
             elif matchedComma and checkFIRSTCustom("params", current) == "":
@@ -243,7 +245,7 @@ def checkFDef():
                 final_errors.append('syntax error (line {}): expected another parameter after comma, recieved "{}"\n'.format(current[2], current[1]))
         
         if not match(['delim', ')']):
-            final_errors.append('syntax error (line {}): expected "(" after function parameters, recieved "{}"\n'.format(current[2], current[1]))
+            final_errors.append('syntax error (line {}): expected ")" after function parameters, recieved "{}"\n'.format(current[2], current[1]))
         
         fdef.decls = checkDeclarations()
         fdef.stmtSeq = checkStmtSeq()

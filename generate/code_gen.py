@@ -8,6 +8,10 @@ code = [] #3TAC generated code - a list for now cause idk
 labelCount = 1
 regCount = 1
 tempCount = 1
+funcHasReturn = 0
+
+# track function return registers
+funcRegs = {}
 
 def generate():
     if semErr:
@@ -41,12 +45,14 @@ def generate():
                 paramPoint += 4
                 code.append("{} = [sp + {}]".format(param.var.id[1], paramPoint))
             genStmts(func.stmtSeq)
+            if funcHasReturn > 0:
+                funcRegs[func.fname[1]] = ["r{}".format(i + 1) for i in range(funcHasReturn)]
             #! is this supposed to always be at the end of a function??
             code.append("pop {PC}")
     
     code.append("main:")
     #! why is this begin 48??????
-    code.append("begin " + str(len(rootTable.variables) * 4))
+    code.append("begin " + str((len(rootTable.variables) + len(program.stmtSeq)) * 4))
 
     # generate statements
     genStmts(program.stmtSeq)
@@ -59,7 +65,7 @@ params:
 return: -
 '''
 def genStmts(stmtSeq):
-    global labelCount, regCount
+    global labelCount, regCount, funcHasReturn
     for index, stmt in enumerate(stmtSeq):
         if isinstance(stmt, nodes.assignStmtNode):
             first = stmt.var.id[1]
@@ -107,6 +113,8 @@ def genStmts(stmtSeq):
             if stmt.type[1] == "return":
                 second = genExpr(stmt.expr)
                 code.append("r{} = {}".format(regCount, second))
+                regCount += 1
+                funcHasReturn += 1
             elif stmt.type[1] == "print":
                 second = genExpr(stmt.expr)
                 code.append("print {}".format(second))
@@ -218,13 +226,26 @@ def genFactor(factor):
         fCallNode = factor.node
         print("GEN FACTOR FCALLNODE")
         print(fCallNode)
-        #TODO: push params and call function
-        # code.append("BL {}".format(fCallNode.fname))
-        return("\nBL {}".format(fCallNode.fname))
+        funcParams = []
+        for index in range(len(fCallNode.exprSeq)):
+            print("FUNC CALL PARAM")
+            print(fCallNode.exprSeq[index])
+            param = genExpr(fCallNode.exprSeq[index])
+            funcParams.append(param)
+            code.append("push {}".format(param))
+        code.append("BL {}".format(fCallNode.fname))
+        funcTemps = []
+        for reg in funcRegs[fCallNode.fname]:
+            funcTemps.append("t{}".format(tempCount))
+            code.append("t{} = {}".format(tempCount, reg))
+            tempCount += 1
+        for param in funcParams:
+            code.append("pop {}".format(param))
+        return(funcTemps[0])
     elif factor.type == "var":
         return(factor.node.id[1])
 
-# TODO: statements: while loops, factor: function calls
+# TODO: statements: while loops
 # TODO: bexpr, bterm, bfactor
 # TODO: figure out more than 1 exprEnd or termEnd (z=2+3+4 or z=2*3*4)
 

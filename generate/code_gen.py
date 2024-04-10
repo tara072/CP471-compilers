@@ -18,10 +18,10 @@ def generate():
             # write error to error output file
             if isinstance(semErr, str):
                 print(semErr)
-                outputErrors(semErr)
+                outputFile(semErr)
                 return None, semErr
             else:
-                outputErrors("Semantic errors, cannot proceed with intermediate code generation.")
+                outputFile("Semantic errors, cannot proceed with intermediate code generation.")
                 print("Semantic errors, cannot proceed with intermediate code generation.")
             return None, "Semantic errors, cannot proceed with intermediate code generation."
     
@@ -57,6 +57,7 @@ def generate():
     # generate statements
     genStmts(program.stmtSeq)
     printFinal(code)
+    outputFile(code)
     return code
 '''
 #* generate statements
@@ -267,9 +268,9 @@ params:
 - code: code to write to file
 return: -
 '''
-def outputErrors(code):
+def outputFile(code):
     output_errors = open('files/intermediate_code.txt', 'w')
-    output_errors.writelines(code)
+    output_errors.writelines("%s\n" % string for string in code)
     output_errors.close()
 
 

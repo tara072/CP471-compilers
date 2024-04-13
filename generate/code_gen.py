@@ -2,7 +2,7 @@ from analyser import analyse
 import nodes
 
 rootTable, program, semErr = analyse()
-code = [] #3TAC generated code - a list for now cause idk
+code = [] #3TAC generated code
 
 # counts for tracking
 tempCount = 1
@@ -296,7 +296,7 @@ def genBfactor(factor, exitLabel, destLabel, negate):
 '''
 #* get or label
 params: -
-return: or label
+return: or label (string)
 '''
 def getORLabel():
     global orLabelCount
@@ -307,7 +307,7 @@ def getORLabel():
 '''
 #* get and label
 params: -
-return: and label
+return: and label (string)
 '''
 def getANDLabel():
     global andLabelCount
@@ -319,9 +319,9 @@ def getANDLabel():
 #* get if labels
 params: -
 returns:
-- if label 
-- else label
-- end if label
+- if label (string)
+- else label (string)
+- end if label (string)
 '''
 def getIfLabel():
     global ifCount
@@ -335,9 +335,9 @@ def getIfLabel():
 #* get previous if labels
 params: -
 returns:
-- previous if label 
-- previous else label
-- previous end if label
+- previous if label (string)
+- previous else label (string)
+- previous end if label (string)
 '''
 def getPrevIfLabel():
     global ifCount
@@ -350,7 +350,7 @@ def getPrevIfLabel():
 '''
 #* get boolean label
 params: -
-return: bool label
+return: bool label (string)
 '''
 def getBoolLabel():
     global boolLabelCount

@@ -11,7 +11,6 @@ orLabelCount = 1
 andLabelCount = 1
 ifCount = 1
 localTempCount = 1
-compCount = 1
     
 # map of operators to compare
 compOps = {
@@ -22,9 +21,6 @@ compOps = {
     '<>': 'BNE',
     '==': 'BEQ'
 }
-
-# track function return registers
-funcRegs = {}
 
 def generate():
     if semErr:
@@ -350,17 +346,6 @@ def getPrevIfLabel():
     endLab = "endif_{}".format(ifCount-1)
     ifCount += 1
     return ifLab, elseLab, endLab
-
-'''
-#* get comparison label
-params: -
-return: comp label
-'''
-def getCompLabel():
-    global compLabelCount
-    compLab = "comp_{}".format(compLabelCount)
-    compLabelCount += 1
-    return compLab
 
 '''
 #* get boolean label

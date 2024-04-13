@@ -1,16 +1,19 @@
-def int max(int x, int y)
-	int z;
-	if(x>y) then
-		z = x
+def int test(int a, int b)
+	while(a>b) do
+		print a;
+		a = a+1
+	od;
+	if (a>b) then
+		print a
 	else
-		z = y
+		print b 
 	fi;
-	return(z)
+	return a
 fed;
 
 int a,b,c,d;
 a = 2;
 b = a * 2 -3;
 c = b/a + 1;
-d = max(max(a,b),c);
+d = test(a, b);
 print(d).

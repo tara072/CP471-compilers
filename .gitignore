@@ -3,4 +3,5 @@ files/lex_errors.txt
 files/lexemes.txt
 files/syntax_errors.txt
 files/sem_errors.txt
+files/intermediate_code.txt
 .vscode/

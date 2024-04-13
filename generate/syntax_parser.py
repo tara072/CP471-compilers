@@ -166,7 +166,7 @@ def parse():
         output_errors.writelines("Lexical errors, cannot proceed with syntax analysis.")
         output_errors.close()
         # print("Lexical errors, cannot proceed with syntax analysis.")
-        return None
+        return None, "Lexical errors, cannot proceed with syntax analysis."
     # print("parse: {}".format(current))
     try:
         program = nodes.Program()

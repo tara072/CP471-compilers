@@ -126,6 +126,8 @@ def genExpr(expr):
             op = opQ[i]
             second = termQ[i]
             code.append("{} = {} {} {}".format(temp, first, op, second))
+            first = temp
+        return temp
     return first
 
 '''
@@ -143,7 +145,7 @@ def genExprEnd(expr, termQ, opQ):
     termQ.append(term)
     opQ.append(expr.op[1])
     if expr.exprE is not None:
-        return genExprEnd(expr.exprEnd, termQ, opQ)
+        return genExprEnd(expr.exprE, termQ, opQ)
     return termQ, opQ
 
 '''

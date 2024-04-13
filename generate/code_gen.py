@@ -98,8 +98,8 @@ def genStmts(stmtSeq):
             genBExpr(stmt.bexpr, "", "", False)
             ifLabel, elseLabel, endIfLabel = getPrevIfLabel()
             code.append("{}:".format(ifLabel))
-            genStmts(stmtSeq)
-            boolLabel = getBoolLabel()
+            genStmts(stmt.stmtSeq)
+            boolLabel = getPrevBoolLabel()
             code.append("b {}".format(boolLabel))
             code.append("{}:".format(elseLabel))
             code.append("{}:".format(endIfLabel))
@@ -344,7 +344,6 @@ def getPrevIfLabel():
     ifLab = "if_{}".format(ifCount-1)
     elseLab = "else_{}".format(ifCount-1)
     endLab = "endif_{}".format(ifCount-1)
-    ifCount += 1
     return ifLab, elseLab, endLab
 
 '''
@@ -356,6 +355,16 @@ def getBoolLabel():
     global boolLabelCount
     boolLab = "bool_{}".format(boolLabelCount)
     boolLabelCount += 1
+    return boolLab
+
+'''
+#* get previous boolean label
+params: -
+return: prev bool label (string)
+'''
+def getPrevBoolLabel():
+    global boolLabelCount
+    boolLab = "bool_{}".format(boolLabelCount-1)
     return boolLab
 
 

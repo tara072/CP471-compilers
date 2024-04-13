@@ -6,4 +6,4 @@
 2. Run `code_gen.py`
 
 ### Files
-The final 3TAC code is saved in `intermediate_code.txt` as a file, as well as printed to the console.
+The final 3TAC code is saved in `intermediate_code.txt` as a file, as well as printed.

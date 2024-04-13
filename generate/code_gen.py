@@ -274,11 +274,11 @@ def genBfactor(factor, exitLabel, destLabel, negate):
         first = genExpr(factor.bcomp.expr1)
         second = genExpr(factor.bcomp.expr2)
         if negate:
-            third = exitLabel
-            fourth = destLabel
-        else:
             third = destLabel
             fourth = exitLabel
+        else:
+            third = exitLabel
+            fourth = destLabel
         code.append("{} {}, {}, {}".format(
             compOps[factor.bcomp.comp[1]],
             first,

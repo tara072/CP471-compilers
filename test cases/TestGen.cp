@@ -1,7 +1,7 @@
 def int test(int a, int b, int c, int d)
 	while((a>b) and (c>d)) do
 		print a;
-		a = a+1
+		a = a+1+2
 	od;
 	if (a>b) then
 		print a
